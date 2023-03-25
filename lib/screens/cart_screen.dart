@@ -45,140 +45,307 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          FutureBuilder(
-              future: cart.getData(),
-              builder: (context, AsyncSnapshot<List<Cart>> snapshot) {
-                if (snapshot.hasData) {
-                  return Expanded(
-                      child: ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            return Card(
-                              // color: Colors.green[100],
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          children: [
+            FutureBuilder(
+                future: cart.getData(),
+                builder: (context, AsyncSnapshot<List<Cart>> snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data!.isEmpty) {
+                      return  Center(
+                          child: Text(
+                        "Cart is Empty",
+                        
+                      ));
+                    } else {
+                      return Expanded(
+                          child: ListView.builder(
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                return Card(
+                                  // color: Colors.green[100],
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Image(
-                                          height: 100,
-                                          width: 100,
-                                          image: NetworkImage(snapshot
-                                              .data![index].image
-                                              .toString()),
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Row(
+                                        Row(
+                                          children: [
+                                            Image(
+                                              height: 100,
+                                              width: 100,
+                                              image: NetworkImage(snapshot
+                                                  .data![index].image
+                                                  .toString()),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                    MainAxisAlignment.start,
                                                 children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        snapshot.data![index]
+                                                            .productName
+                                                            .toString(),
+                                                        style: const TextStyle(
+                                                            fontSize: 15,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      InkWell(
+                                                          onTap: () {
+                                                            dbHelper.delete(
+                                                                snapshot
+                                                                    .data![
+                                                                        index]
+                                                                    .id!);
+                                                            cart.removeCounter();
+                                                            cart.removeTotalPrice(
+                                                                double.parse(snapshot
+                                                                    .data![
+                                                                        index]
+                                                                    .productPrice
+                                                                    .toString()));
+                                                          },
+                                                          child: const Icon(
+                                                              Icons.delete)),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 8,
+                                                  ),
                                                   Text(
                                                     snapshot.data![index]
-                                                        .productName
-                                                        .toString(),
+                                                            .unitTag
+                                                            .toString() +
+                                                        " " +
+                                                        "\$" +
+                                                        snapshot.data![index]
+                                                            .productPrice
+                                                            .toString(),
                                                     style: const TextStyle(
-                                                        fontSize: 15,
+                                                        fontSize: 13,
                                                         fontWeight:
-                                                            FontWeight.bold),
+                                                            FontWeight.w600),
                                                   ),
-                                                  InkWell(
-                                                      onTap: () {
-                                                        dbHelper.delete(snapshot
-                                                            .data![index].id!);
-                                                        cart.removeCounter();
-                                                        cart.removeTotalPrice(
-                                                            double.parse(snapshot
-                                                                .data![index]
-                                                                .productPrice
-                                                                .toString()));
-                                                      },
-                                                      child:
-                                                          Icon(Icons.delete)),
+                                                  const SizedBox(
+                                                    height: 8,
+                                                  ),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: InkWell(
+                                                      onTap: () {},
+                                                      child: Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.green,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                        ),
+                                                        height: 30,
+                                                        width: 100,
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      8.0),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              InkWell(
+                                                                onTap: () {
+                                                                  int quantity = snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .quantity!;
+                                                                  int price = snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .initialPrice!;
+                                                                  quantity--;
+                                                                  int?
+                                                                      newPrice =
+                                                                      price *
+                                                                          quantity;
+                                                                  if (quantity >
+                                                                      0) {
+                                                                    dbHelper
+                                                                        .update(Cart(
+                                                                            id: snapshot.data![index].id!,
+                                                                            productId: snapshot.data![index].id!.toString(),
+                                                                            productName: snapshot.data![index].productName!,
+                                                                            initialPrice: snapshot.data![index].initialPrice!,
+                                                                            productPrice: newPrice,
+                                                                            quantity: quantity,
+                                                                            unitTag: snapshot.data![index].unitTag.toString(),
+                                                                            image: snapshot.data![index].image.toString()))
+                                                                        .then((value) {
+                                                                      newPrice =
+                                                                          0;
+                                                                      quantity =
+                                                                          0;
+                                                                      cart.removeTotalPrice(double.parse(snapshot
+                                                                          .data![
+                                                                              index]
+                                                                          .initialPrice!
+                                                                          .toString()));
+                                                                    }).onError((error, stackTrace) {
+                                                                      print(error
+                                                                          .toString());
+                                                                    });
+                                                                  }
+                                                                },
+                                                                child:
+                                                                    const Icon(
+                                                                  Icons.remove,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                snapshot
+                                                                    .data![
+                                                                        index]
+                                                                    .quantity
+                                                                    .toString(),
+                                                                // ignore: prefer_const_constructors
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                              InkWell(
+                                                                onTap: () {
+                                                                  int quantity = snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .quantity!;
+                                                                  int price = snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .initialPrice!;
+                                                                  quantity++;
+                                                                  int?
+                                                                      newPrice =
+                                                                      price *
+                                                                          quantity;
+
+                                                                  dbHelper
+                                                                      .update(Cart(
+                                                                          id: snapshot
+                                                                              .data![
+                                                                                  index]
+                                                                              .id!,
+                                                                          productId: snapshot
+                                                                              .data![
+                                                                                  index]
+                                                                              .id!
+                                                                              .toString(),
+                                                                          productName: snapshot
+                                                                              .data![
+                                                                                  index]
+                                                                              .productName!,
+                                                                          initialPrice: snapshot
+                                                                              .data![
+                                                                                  index]
+                                                                              .initialPrice!,
+                                                                          productPrice:
+                                                                              newPrice,
+                                                                          quantity:
+                                                                              quantity,
+                                                                          unitTag: snapshot
+                                                                              .data![
+                                                                                  index]
+                                                                              .unitTag
+                                                                              .toString(),
+                                                                          image: snapshot
+                                                                              .data![
+                                                                                  index]
+                                                                              .image
+                                                                              .toString()))
+                                                                      .then(
+                                                                          (value) {
+                                                                    newPrice =
+                                                                        0;
+                                                                    quantity =
+                                                                        0;
+                                                                    cart.addTotalPrice(double.parse(snapshot
+                                                                        .data![
+                                                                            index]
+                                                                        .initialPrice!
+                                                                        .toString()));
+                                                                  }).onError((error,
+                                                                          stackTrace) {
+                                                                    print(error
+                                                                        .toString());
+                                                                  });
+                                                                },
+                                                                child:
+                                                                    const Icon(
+                                                                  Icons.add,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
-                                              const SizedBox(
-                                                height: 8,
-                                              ),
-                                              Text(
-                                                snapshot.data![index].unitTag
-                                                        .toString() +
-                                                    " " +
-                                                    "\$" +
-                                                    snapshot.data![index]
-                                                        .productPrice
-                                                        .toString(),
-                                                style: const TextStyle(
-                                                    fontSize: 13,
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                              ),
-                                              const SizedBox(
-                                                height: 8,
-                                              ),
-                                              Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: InkWell(
-                                                  onTap: () {},
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.green,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                    height: 30,
-                                                    width: 100,
-                                                    child: const Center(
-                                                        child: Text(
-                                                      'Added',
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    )),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }));
-                } else {}
-                return Text('');
-              }),
-          Consumer<CartProvider>(builder: (context, value, child) {
-            return Visibility(
-              visible: value.getTotalPrice().toStringAsFixed(2)=="0.00"? false:true,
-              child: Column(
-                children: [
-                  ReusableWidget(
-                      title: 'SubTotal',
-                      value: r'$' + value.getTotalPrice().toStringAsFixed(2))
-                ],
-              ),
-            );
-          })
-        ],
+                                  ),
+                                );
+                              }));
+                    }
+                  }
+                  return const Text('');
+                }),
+            Consumer<CartProvider>(builder: (context, value, child) {
+              return Visibility(
+                visible: value.getTotalPrice().toStringAsFixed(2) == "0.00"
+                    ? false
+                    : true,
+                child: Column(
+                  children: [
+                    ReusableWidget(
+                        title: 'SubTotal',
+                        value: r'$' + value.getTotalPrice().toStringAsFixed(2))
+                  ],
+                ),
+              );
+            })
+          ],
+        ),
       ),
     );
   }
